@@ -107,6 +107,8 @@ int main() {
         present_vals[buf[0]] = 1;
     }
 
+    fclose(f);
+
     int collector = 0;
     for (int i = 0; i < INPUT_LEN; i++) collector += abs(pq_remove(pq_b) - pq_remove(pq_a));
 
