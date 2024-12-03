@@ -22,11 +22,77 @@ int main() {
 
     for (int i = 0; i < raw_str_len; i++) {
         char subs[4 + 1];
-        if (i + 4 >= raw_str_len || raw_str[i] != 'm') {
+
+        if (i + 4 >= raw_str_len || raw_str[i] != 'm') continue;
+
+        strncpy(subs, raw_str + i, 4);
+        subs[4] = '\0';
+
+        if (strcmp("mul(", subs) != 0) continue;
+
+        i += 4;
+        if (i >= raw_str_len) break;
+        
+        short nums[2] = {SHRT_MIN, SHRT_MIN};
+        char terminators[2] = {',', ')'};
+
+        for (int j = 0; j < 2; j++) {
+            int start_number = i;
+
+            for (int k = 0; k < 3; k++) {
+                if (!isdigit(raw_str[i])) break;
+                i++;
+            }
+            
+            if (raw_str[i] != terminators[j]) break;
+
+            char* number = malloc((3 + 1) * sizeof(char));
+            strncpy(number, raw_str + start_number, i - start_number);
+            number[i - start_number] = '\0';
+
+            nums[j] = atoi(number);
+            free(number);
+            i++;
+        }
+
+        if (nums[0] == SHRT_MIN || nums[1] == SHRT_MIN) continue;
+        collector += nums[0] * nums[1];
+        i--;
+    }
+    printf("%ld\n", collector);
+
+    collector = 0;
+    char should_do = 1;
+    
+    for (int i = 0; i < raw_str_len; i++) {
+        char subs[7 + 1];
+        if (i + 8 <= raw_str_len || raw_str[i] != 'd') { 
+            strncpy(subs, raw_str + i, 7);
+            subs[7] = '\0';
+            if (strcmp("don't()", subs) == 0) {
+                should_do = 0;
+                i += 7;
+            }
+        }
+
+        if (i + 5 <= raw_str_len || raw_str[i] != 'd') { 
             strncpy(subs, raw_str + i, 4);
             subs[4] = '\0';
-            if (strcmp("mul(", subs) != 0) continue;
+            if (strcmp("do()", subs) == 0) {
+                should_do = 1;
+                i += 4;
+            }
         }
+
+        if (!should_do) continue;
+
+
+        if (i + 4 >= raw_str_len || raw_str[i] != 'm') continue;
+
+        strncpy(subs, raw_str + i, 4);
+        subs[4] = '\0';
+
+        if (strcmp("mul(", subs) != 0) continue;
 
         i += 4;
         if (i >= raw_str_len) break;
