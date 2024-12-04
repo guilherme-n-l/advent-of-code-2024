@@ -28,12 +28,13 @@ int get_index_from_operation(int idx, char op) {
 
 int main() {
     FILE *f = fopen("input.txt", "r");
-    int arr_len = 0, x_arr[3680], x_arr_len = 0;
+    int arr_len = 0, x_arr[3680], x_arr_len = 0, a_arr[4913], a_arr_len = 0;
     char ln[ROW_LEN + 2], arr[ARR_LEN];
     while (fgets(ln, sizeof(ln), f)) {
         for (int i = 0; i < ROW_LEN; i++) {
             arr[arr_len++] = ln[i];
             if (ln[i] == 'X') x_arr[x_arr_len++] = arr_len - 1;
+            else if (ln[i] == 'A') a_arr[a_arr_len++] = arr_len - 1;
         }
     } 
     fclose(f);
@@ -55,6 +56,33 @@ int main() {
 
             if (strcmp(word, "XMAS") == 0) collector++;
         }
+    }
+    printf("%d\n", collector);
+
+    collector = 0;
+    for (int i = 0; i < a_arr_len; i++) {
+        int cursor = a_arr[i];
+        char is_viable = 1, diags[4] = {0};
+
+        for (int j = 4; j < 8; j++) {
+            int jdx = get_index_from_operation(cursor, j);
+            
+            if (jdx == -1) {
+                is_viable = 0;
+                break;
+            }
+
+            diags[j - 4] = arr[jdx];
+        }
+
+        if (!is_viable) continue;
+
+        char word_a[] = {diags[0], 'A', diags[3], '\0'}, word_b[] = {diags[1], 'A', diags[2], '\0'};
+
+        if (
+            (strcmp(word_a, "MAS") == 0 || strcmp(word_a, "SAM") == 0) &&
+            (strcmp(word_b, "MAS") == 0 || strcmp(word_b, "SAM") == 0)
+        ) collector++;
     }
 
     printf("%d\n", collector);
