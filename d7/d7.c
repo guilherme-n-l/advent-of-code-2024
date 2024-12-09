@@ -70,7 +70,7 @@ char explore_w_concat(long num, int depth[], int max_depth, char op) {
 
 int main() {
     FILE *f = fopen("input.txt", "r");
-    char ln[41 + 2];
+    char ln[LINE_LEN + 2];
     while (fgets(ln, sizeof(ln), f)) {
         char delim[] = ": ", *tok = strtok(ln, delim);
         nums[nums_len++] = atol(tok);
