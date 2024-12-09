@@ -56,5 +56,43 @@ int main() {
     }
 
     printf("%d\n", collector);
+
+    memset(has_interference, 0, sizeof(has_interference));
+    collector = 0;
+    for (int i = 0; i < strlen(chars); i++) {
+        for (int j = 0; j < char_idx_arr_len[i]; j++) {
+            int jdx = char_idx_arr[i][j], jdx_x = _X(jdx), jdx_y = _Y(jdx);
+            for (int k = 0; k < char_idx_arr_len[i]; k++) {
+                if (j == k) continue;
+
+                int kdx = char_idx_arr[i][k], kdx_x = _X(kdx), kdx_y = _Y(kdx),
+                interf_x = jdx_x, interf_y = jdx_y, interf_idx = (interf_x * LINE_LEN) + interf_y;;
+
+                if (!has_interference[interf_idx]) {
+                    has_interference[interf_idx]++;
+                    collector++;
+                }
+
+                while (1) {
+                    interf_x -= kdx_x - jdx_x, interf_y -= kdx_y - jdx_y;
+                    if (
+                            interf_x < 0 ||
+                            interf_x >= LINE_LEN ||
+                            interf_y < 0 ||
+                            interf_y >= LINE_LEN
+                       ) break;
+
+                    interf_idx = (interf_x * LINE_LEN) + interf_y;
+
+                    if (!has_interference[interf_idx]) {
+                        has_interference[interf_idx]++;
+                        collector++;
+                    }
+                }
+            }
+        }
+    }
+
+    printf("%d\n", collector);
     return 0;
 }
