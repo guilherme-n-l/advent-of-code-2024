@@ -1,39 +1,46 @@
-#include <limits.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 #define INPUT_LEN 19999
-#define DISK_SIZE 9 * INPUT_LEN
-#define DELIM '\xFF'
+#define DISK_SIZE (9 * INPUT_LEN)
 
 int main() {
     FILE *f = fopen("input.txt", "r");
-    char input[INPUT_LEN + 1], disk[DISK_SIZE + 1] = {0};
+
+    char input[INPUT_LEN + 1];
     fgets(input, sizeof(input), f);
 
-    int cursor = 0, current_block = 1;
+    int cursor = 0, current_block = 0, disk[DISK_SIZE];
     for (int i = 0; i < INPUT_LEN; i++) {
-        if (i & 1) memset(disk + cursor, DELIM, input[i]);
-        else memset(disk + cursor, current_block++, input[i]);
-        cursor += atoi((char[]){input[i], '\0'});
-    }
-    disk[cursor--] = '\0';
+        int b_size = input[i] - '0';
+        if (i & 1) for (int i = 0; i < b_size; i++) disk[cursor + i] = -1;
+        else {
+            for (int i = 0; i < b_size; i++) disk[cursor + i] = current_block;
+            current_block++;
+        }
 
-    const char delim[] = {DELIM, '\0'};
-    char *tok = strtok(disk, delim);
-
-    for (int i = 0; i < cursor + 1; i++) printf(disk[i] != '\xFF' ? "%d" : "*", disk[i] - 1);
-    printf("\n");
-
-    while (tok) {
-        tok[0] = disk[cursor];
-        printf("tok: %ld\n", tok - disk);
-        disk[cursor--] = '\0';
-        tok = strtok(NULL, delim);
+        cursor += b_size;
     }
 
-    for (int i = 0; i < cursor + 1; i++) printf(disk[i] != -1 ? "%d" : "*", disk[i] - 1);
-    printf("\n");
+    int b_cursor = cursor - 1;
+    cursor = 0;
+
+    while (cursor < b_cursor) {
+        if (disk[cursor] != -1) {
+            cursor++;
+            continue;
+        }
+
+        if (disk[b_cursor] == -1) {
+            b_cursor--;
+            continue;
+        }
+
+        disk[cursor++] = disk[b_cursor--];
+    }
+
+    long collector = 0;
+    for (int i = 0; i <= cursor; i++) collector += i * disk[i];
+
+    printf("%ld\n", collector);
 
     return 0;
 }
