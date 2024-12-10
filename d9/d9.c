@@ -47,31 +47,36 @@ int main() {
 
     printf("%ld\n", collector);
 
-    int blocks[INPUT_LEN][3], blocks_len = 0;
-    for (int i = 0; i < c_disk_len; i++) {
-        int block_id = c_disk[i], start_i = i;
-        while (c_disk[i] == block_id) i++;
-        memcpy(blocks[blocks_len], (int[]){start_i, block_id, i - start_i}, sizeof(blocks[blocks_len]));
-        blocks_len++;
-        i--;
-    }
+    for (int i = c_disk_len - 1; i >= 0;) {
+        if (c_disk[i] == -1) {
+            i--;
+            continue;
+        }
 
-    for (int i = blocks_len - 1; i >= 0; i--) {
-        int f_block_id = blocks[i][1], f_block_size = blocks[i][2];
+        int b_id = c_disk[i], b_size = 1;
+        while (c_disk[--i] == b_id) b_size++;
 
-        if (f_block_id == -1) continue;
+        for (int j = 0; j <= i; j++) {
+            if (c_disk[j] != -1) continue;
 
-        for (int j = 0; j < i; j++) {
-            int r_block_id = blocks[j][1], r_block_size = blocks[j][2];
+            int r_start = j, r_b_size = 1;
+            while (c_disk[++j] == -1) r_b_size++;
 
-            if (r_block_id != -1 || r_block_size < f_block_size) continue;
-
-            int r_block_idx = blocks[j][0];
-
-            for (int k = r_block_idx; k < (r_block_idx + f_block_size); k++) c_disk[k] = f_block_id;
+            if (r_b_size >= b_size) {
+                for (int k = 0; k < b_size; k++) c_disk[r_start + k] = b_id;
+                for (int k = 0; k < b_size; k++) c_disk[i + 1 + k] = -1;
+                break;
+            }
         }
     }
 
+    collector = 0;
+    for (int i = 0; i <= c_disk_len; i++) {
+        if (c_disk[i] == -1) continue;
+        collector += i * c_disk[i];
+    }
+
+    printf("%ld\n", collector);
 
     return 0;
 }
