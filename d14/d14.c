@@ -5,8 +5,10 @@
 
 #define LINE_LEN 19
 #define INPUT_LEN 500
+#define N_TICKS 100
 #define ROW_LEN 101
 #define N_ROWS 103
+#define EASTER_EGG 7492
 #define BOARD_LEN N_ROWS * ROW_LEN
 #define SEP "=, \n"
 #define UP(A) ((A) - ROW_LEN < 0 ? ((N_ROWS - 1) * ROW_LEN + (A)) : (A) - ROW_LEN)
@@ -66,13 +68,9 @@ void tick(robot_t *r) {
     board[idx]++;
 }
 
-void simulate(int n) {
-    for (int i = 0; i < n; i++)
-        for (int j = 0; j < input_len; j++)
-            tick(&input[j]);
-}
 long get_score() {
     long q1 = 0, q2 = 0, q3 = 0, q4 = 0;
+
     for (int i = 0; i < BOARD_LEN; i++) {
         if (i / ROW_LEN < N_ROWS / 2 && i % ROW_LEN < ROW_LEN / 2) q1+= board[i];
         else if (i / ROW_LEN < N_ROWS / 2 && i % ROW_LEN > ROW_LEN / 2) q2+= board[i];
@@ -82,9 +80,25 @@ long get_score() {
     return q1 * q2 * q3 * q4;
 }
 
+void simulate(int n) {
+    for (int i = 0; i < n; i++) {
+        for (int j = 0; j < input_len; j++)
+            tick(&input[j]);
+        if (i == N_TICKS - 1) printf("%ld\n", get_score());
+        if (i != (EASTER_EGG - 1)) continue;
+
+        for (int i = 0; i < BOARD_LEN; i++) {
+            if (board[i] == 0) printf(".");
+            else printf("#");
+            if (!((i+1)%ROW_LEN)) printf("\n");
+        }
+        usleep(900 * 1e3);
+    }
+}
+
 int main() {
     get_input();
-    simulate((int)1e2);
-    printf("%ld\n", get_score());
+    simulate((int)EASTER_EGG);
+    printf("%d\n", EASTER_EGG);
     return 0;
 }
