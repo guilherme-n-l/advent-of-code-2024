@@ -1,5 +1,5 @@
 CC = gcc
-CFLAGS = -O5 -Wall -g
+CFLAGS = -O3 -g
 LDFLAGS = 
 
 default: d15
@@ -9,3 +9,9 @@ d15: d15.c
 
 clean:
 	rm -rf d15
+
+run:
+	make && ./d15
+
+debug:
+	make && gdb --tui ./d15
